@@ -26,45 +26,65 @@ class Agenda {
 
     //#endregion
 
-    #tasks = new TaskList();
+    #taskList = new TaskList();
 
-    //#region next execution tracker variables and methods
+    //#region Task tracker
+    // Keeps track of what tasks will be executed by the existing timer object and when those tasks will execute.
 
-    #nextTasks = null;
+    #nextTasksIds = null;
     #activeTimerId = null;
     #nextExecutionTime = null;
 
-    #executeTrackedJob() {
-        const ids = [];
-        for (const task of this.#nextTasks) {
+    /**
+     * Gets the next tasks to be executed. If no values are found, then an empty array is given.
+     * @returns {Task[]} Pulls copies of the next tasks to be executes for the tasklist, or an empty array.
+     */
+    #getTrackedTasks() {
+        if (Array.isArray(this.#nextTasksIds) && this.#nextTasksIds.length > 0) {
+            const tasks = this.#taskList.getTasks_id(...this.#nextTasksIds);
+            return tasks;
+        }
+
+        return [];
+    }
+
+    #executeTrackedTasks() {
+        const nextTasks = this.#getTrackedTasks();
+        const executedTasksIds = [];
+        for (const task of nextTasks) {
             if (task instanceof Task) {
-                ids.push(task.getId());
+                executedTasksIds.push(task.getId());
                 task.execute();
             }
         }
 
-        this.#tasks.removeTasks(...ids);
-        this.#clearNextTaskTracker();
-        this.#updateNextTaskTracker();
+        this.#taskList.removeTasks(...executedTasksIds);
+        this.#clearTaskTracker();
+        this.#setTaskTracker();
     }
 
-    #updateNextTaskTracker() {
-        const newNextTasks = this.#tasks.getNextTasks();
+    #setTaskTracker() {
+        const newNextTaskIds = this.#taskList.getNextTaskIds();
 
-        if (newNextTasks != null && newNextTasks.length > 0) {
-            this.#nextTasks = newNextTasks;
-            this.#nextExecutionTime = newNextTasks[0].getExectutionTime();
-            const delay = newNextTasks[0].getTimeTillExecution();
+        if (newNextTaskIds.length > 0) {
+            const sampleTask = this.#taskList.getTasks_id(newNextTaskIds[0])[0];
+            const delay = sampleTask.getTimeTillExecution();
+
+            this.#nextExecutionTime = sampleTask.getExectutionTime();
+
+            this.#nextTasksIds = newNextTaskIds;
+
             this.#activeTimerId = setTimeout(() => {
-                this.#executeTrackedJob();
+                this.#executeTrackedTasks();
             }, delay);
+
         } else {
             // do nothing
         }
     }
 
-    #clearNextTaskTracker() {
-        this.#nextTasks = null;
+    #clearTaskTracker() {
+        this.#nextTasksIds = null;
         this.#nextExecutionTime = null;
         if (this.#activeTimerId != null) {
             clearTimeout(this.#activeTimerId);
@@ -72,24 +92,15 @@ class Agenda {
         }
     }
 
-    getNextExectutionTime() {
-        return new Date(this.#nextExecutionTime);
-    }
-
-    //#endregion
-
     /**
-     * Give the total number of tasks still waiting to be executed.
-     * @returns {Number} The number of tasks on the Agenda as an integer.
+     * Checks the array of next-tasks-to-be-executed (called tracked tasks) that is stored within the Agenda object against the one stored within the Tasklist.
+     * If the arrays contain the same elements (in any order) and are the same length, then nothing is done.
+     * Otherwise, the Agenda's tracked tasks are updated to match the TaskList.
      */
-    getTaskCount() {
-        return this.#tasks.taskCount();
-    }
-
-    #checkNextTasks() {
-        const ids_them = this.#tasks.getNextTaskIds();
-        const ids_mine = (this.#nextTasks != null && Array.isArray(this.#nextTasks)) ?
-            this.#nextTasks.map(task => task.getId()) :
+    #checkTaskTracker() {
+        const ids_them = this.#taskList.getNextTaskIds();
+        const ids_mine = (Array.isArray(this.#nextTasksIds)) ?
+            this.#nextTasksIds :
             [];
 
         let changed = false;
@@ -107,21 +118,35 @@ class Agenda {
         }
 
         if (changed) {
-            this.#clearNextTaskTracker();
-            this.#updateNextTaskTracker();
+            this.#clearTaskTracker();
+            this.#setTaskTracker();
         }
+    }
+
+    getNextExectutionTime() {
+        return new Date(this.#nextExecutionTime);
+    }
+
+    //#endregion
+
+    /**
+     * Give the total number of tasks still waiting to be executed.
+     * @returns {Number} The number of tasks on the Agenda as an integer.
+     */
+    getTaskCount() {
+        return this.#taskList.taskCount();
     }
 
     /**
      * Adds one or more tasks to the Agenda. Returns the total number of tasks after they addition.
      * Once a task is added, it will execute automatically once its execution time has arrived.
      * @param  {...Task} newTasks The tasks to be added.
-     * @returns {Number} The number of tasks on the Agenda.
+     * @returns {Number} The number of tasks on the Agenda. See getTaskCount().
      */
     addTasks(...newTasks) {
-        const changed = this.#tasks.addTasks(...newTasks);
+        const changed = this.#taskList.addTasks(...newTasks);
         if (changed) {
-            this.#checkNextTasks();
+            this.#checkTaskTracker();
         }
         return this.getTaskCount();
     }
@@ -129,12 +154,12 @@ class Agenda {
     /**
      * Removes all of the tasks with the given ids. Returns the count of the remain tasks after the subtraction.
      * @param  {...String} taskIds The unique identifiers of the tasks to be deleted.
-     * @returns {Number} The number of tasks remaining on the Agenda.
+     * @returns {Number} The number of tasks remaining on the Agenda. See getTaskCount().
      */
     removeTask(...taskIds) {
-        const changed = this.#tasks.removeTasks(taskIds);
+        const changed = this.#taskList.removeTasks(taskIds);
         if (changed) {
-            this.#checkNextTasks();
+            this.#checkTaskTracker();
         }
         return this.getTaskCount();
     }
@@ -143,10 +168,10 @@ class Agenda {
      * Searches for a specific task using the given taskId. If one is found, it is exeuted.
      * @param {String} taskId The task id to search for.
      * @param {Boolean} removeAfterExecution Should the task be removed from the agenda after execution? By default, this is true.
-     * @returns {Number} The number of remaining tasks.
+     * @returns {Number} The number of remaining tasks. See getTaskCount().
      */
     executeTaskNow(taskId, removeAfterExecution = true) {
-        const tasks = this.#tasks.getTasks_id(taskId)
+        const tasks = this.#taskList.getTasks_id(taskId)
         if (tasks != null && tasks.length > 0) {
             tasks[0].execute();
             if (removeAfterExecution) {
@@ -161,7 +186,7 @@ class Agenda {
      * @returns {TaskList} Readonly copy of task list.
      */
     getTaskList() {
-        return this.#tasks.getCopy();
+        return this.#taskList.getCopy();
     }
 
     /**
@@ -169,10 +194,10 @@ class Agenda {
      * @returns {Object} Human readable copy of contents.
      */
     toJson() {
-        const nextTasks = this.#nextTasks != null ? this.#nextTasks.map(task => task.toJson()) : null;
+        const nextTaskIds = Array.isArray(this.#nextTasksIds) ? this.#nextTasksIds : [];
         const output = {
-            tasks: this.#tasks.toJson(),
-            nextTask: nextTasks,
+            tasklist: this.#taskList.toJson(),
+            nextTaskIds: [...nextTaskIds],
             activeTimerId: this.#activeTimerId,
             nextExecutionTime: this.#nextExecutionTime,
         };

@@ -116,10 +116,17 @@ class Task {
         return this.#payloadArguments;
     }
 
+    /**
+     * Executes the payload task with the given payload arguements.
+     */
     execute() {
         this.#payloadFunction(...this.#payloadArguments);
     }
 
+    /**
+     * This method tells how long until this task is meant to execute.
+     * @returns {Number} Time in milliseconds until this task is scheduled to execute.
+     */
     getTimeTillExecution() {
         const nowTime = new Date();
         const output = Math.max((this.#executionTime - nowTime), 0);

@@ -1,14 +1,14 @@
 {
   "name": "task-timer",
   "version": "1.0.0",
-  "description": "A simple task scheduler for javascipt.",
+  "description": "A simple task scheduler for javascipt with no requirements.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon ./tests/tester.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Joseph Bethune",
   "license": "ISC",
   "type": "module",
   "devDependencies": {
