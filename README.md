@@ -1,10 +1,10 @@
 # Basic Usage
-Using the Agenda is simple and can be done in 3 easy steps.
+Using the Agenda is simple and can be done in 4 easy steps.
 1. Initialize Agenda
 2. Define a Task
 3. Add task to Agenda
 4. Wait for execution
-## Basic example
+## Basic summarized example
 ```
 const agenda = Agenda.getAgenda();
 
@@ -30,6 +30,7 @@ const agenda = Agenda.getAgenda();
 There are two ways to create a Task:
 1. Use a delay
 2. Use an execution time
+
 The only differance is the first arguement.
 
 Using **setName()** to label the Tasks is optional.
@@ -92,7 +93,7 @@ Once a task is added to the agenda, it will automatically execute when its time 
 agenda.addTasks(task1, task2);
 ```
 ## Wait
-After the elapsed time (2 seconds and then 4 seconds in this example), the following message will be displayed in the console.
+After the elapsed time periods, the following message will be displayed in the console.
 ```
 This is Task 1. // this will display after 2 seconds
 This is Task 2. // this will display after 4 seconds
