@@ -314,6 +314,10 @@ class TaskList {
         return output;
     }
 
+    /**
+     * Attempts to generate a human readable copy of the contents of this object. Results vary.
+     * @returns {Object} Human readable copy of contents.
+     */
     toJson() {
         const copy = this.getCopy();
         const tasks = {};

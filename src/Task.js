@@ -7,7 +7,7 @@ class Task {
     #payloadArguments
 
     /**
-     * Creates a new Task object that will execute the given function when the execution time has arrived.
+     * Creates a new Task object that can be used to schedule a delayed function execution once the designated time has arrived.
      * Must be added to an Agenda object in order to trigger automatically.
      * @param {Date} executionTime A Date object specifying when the execution function is to be triggered.
      * @param {Function} executionFunction The function to be executed when the exectuion time has been reached.
@@ -36,7 +36,7 @@ class Task {
     }
 
     /**
-     * Creates a new Task object that will execute the given function after the delay period has passed.
+     * Creates a new Task object that can be used to schedule a delayed function execution once the delay period has passed.
      * Must be added to an Agenda object in order to trigger automatically.
      * @param {Number} executionDelay The delay in miliseconds that must pass before the execution function is triggered.
      * @param {Function} executionFunction The function to be executed when the exectuion time has been reached.
@@ -116,18 +116,6 @@ class Task {
         return this.#payloadArguments;
     }
 
-    toJson() {
-        const copy = this.getCopy();
-        return {
-            id: copy.#id,
-            name: copy.#name,
-            creationTime: copy.#creationTime,
-            executionTime: copy.#executionTime,
-            payloadFunction: copy.#payloadFunction,
-            payloadArguments: [...copy.#payloadArguments],
-        }
-    }
-
     execute() {
         this.#payloadFunction(...this.#payloadArguments);
     }
@@ -135,6 +123,24 @@ class Task {
     getTimeTillExecution() {
         const nowTime = new Date();
         const output = Math.max((this.#executionTime - nowTime), 0);
+        return output;
+    }
+
+    /**
+     * Attempts to generate a human readable copy of the contents of this object. Results vary.
+     * @returns {Object} Human readable copy of contents.
+     */
+    toJson() {
+        const copy = this.getCopy();
+        const output = {
+            id: copy.#id,
+            name: copy.#name,
+            creationTime: copy.#creationTime,
+            executionTime: copy.#executionTime,
+            payloadFunction: copy.#payloadFunction,
+            payloadArguments: [...copy.#payloadArguments],
+        }
+
         return output;
     }
 }
