@@ -1,3 +1,12 @@
+/**
+ * An schedulable, executable task.
+ * 
+ * At its core, a Task is a fuction to be executed, the arguements to be given to that function, 
+ * and a timestamp indicating when that function is scheduled to execute.
+ *  
+ * The Task also stores additional information: 
+ * a name, a description, a timestamp indicating when the Task was created.
+ */
 class Task {
     #id = ""
     #name = null
@@ -6,6 +15,8 @@ class Task {
     #executionTime
     #payloadFunction
     #payloadArguments
+
+    //#region Static Factor Methods
 
     /**
      * Creates a new Task object that can be used to schedule a delayed function execution once the designated time has arrived.
@@ -66,24 +77,14 @@ class Task {
         return output;
     }
 
+    //#endregion    
+
+    //#region getters and setters
+
     /**
-     * Creates a copy of the calling task to protect the original object.
-     * @returns {Task} Returns a copy of the calling task.
+     * Gives the id of this Task.
+     * @returns {String} The unique identifier assigned to this Task.
      */
-    getCopy() {
-        const output = new Task();
-
-        output.#id = this.#id;
-        output.#name = this.#name
-        output.#description = this.#description;
-        output.#creationTime = this.#creationTime
-        output.#executionTime = this.#executionTime
-        output.#payloadFunction = this.#payloadFunction
-        output.#payloadArguments = [...this.#payloadArguments]
-
-        return output;
-    }
-
     getId() {
         return this.#id;
     }
@@ -176,6 +177,26 @@ class Task {
         } else {
             return [];
         }
+    }
+
+    //#endregion
+
+    /**
+     * Creates a copy of the calling task to protect the original object.
+     * @returns {Task} Returns a copy of the calling task.
+    */
+    getCopy() {
+        const output = new Task();
+
+        output.#id = this.#id;
+        output.#name = this.#name
+        output.#description = this.#description;
+        output.#creationTime = this.#creationTime
+        output.#executionTime = this.#executionTime
+        output.#payloadFunction = this.#payloadFunction
+        output.#payloadArguments = [...this.#payloadArguments]
+
+        return output;
     }
 
     /**

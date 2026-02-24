@@ -1,7 +1,7 @@
 import { Task, TaskList } from "./TaskList.js";
 
 /**
- * Test doc.
+ * Once initialized, the Agenda automatically executes the Tasks stored in the Agenda's internal TaskList when said Tasks are scheduled to execute.
  */
 class Agenda {
 

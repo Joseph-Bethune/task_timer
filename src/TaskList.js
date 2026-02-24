@@ -1,6 +1,9 @@
 import { randomBytes } from "node:crypto";
 import { Task } from "./Task.js"
 
+/**
+ * Stores a group of Tasks and orders them by their execution times.
+ */
 class TaskList {
 
     #tasks = {}
@@ -138,13 +141,32 @@ class TaskList {
      * They keys paired with those values are the Task's id.
      * @returns {Object} Generates a copy of the task dictionary.
      */
-    getTasksCopy() {
+    getTaskCopies() {
         const output = {};
         for (const [key, value] of Object.entries(this.#tasks)) {
             output[key] = value.getCopy();
         }
 
         return output;
+    }
+
+    /**
+     * This method copies each Task stored in the TaskList into a flat array.
+     * @returns {Task[]} An array of Task copies.
+     */
+    getTaskCopies_flat() {
+        if (this.#tasks == null) {
+            return [];
+        }
+        const originals = Object.values(this.#tasks);
+
+        if (Array.isArray(originals) && originals.length > 0) {
+            const copies = originals.map(org => org.getCopy());
+            return copies;
+
+        } else {
+            return [];
+        }
     }
 
     /**
@@ -155,7 +177,7 @@ class TaskList {
     getCopy() {
         const output = new TaskList();
 
-        output.#tasks = this.getTasksCopy();
+        output.#tasks = this.getTaskCopies();
         output.#timeline = this.getTimelineCopy();
 
         return output;
@@ -175,7 +197,7 @@ class TaskList {
 
     /**
      * Adds one or more tasks to the tasklist. Each element is defensively copied before added.
-     * If any changes are made to the TaskList, then all elements are re-ordered to ensure they remain organized.
+     * If any changes are made to the TaskList, then all elements are re-ordered to ensure the TaskList remains organized.
      * @param  {...Task} newTasks Tasks to be added.
      * @returns {Boolean} Returns true if the tasklist was altered, or else false.
      */
@@ -203,7 +225,7 @@ class TaskList {
 
     /**
      * Removes one or more tasks from the tasklist.
-     * If any changes are made to the TaskList, then all elements are re-ordered to ensure they remain organized.
+     * If any changes are made to the TaskList, then all elements are re-ordered to ensure the TaskList remains organized.
      * @param  {...String} taskIds Ids of the tasks to be removed.
      * @returns {Boolean} Returns true if the tasklist was altered, or else false.
      */
@@ -298,7 +320,6 @@ class TaskList {
     /**
      * Finds all tasks within this list whose task name contains the search string. 
      * The copies of the found items are placed into a new TaskList.
-     * The new TaskList is not orderd. 
      * @param {String} searchString The search criteria. 
      * @param {Boolean} caseSensitive Whether or not case will be ignored during search.
      * @returns {TaskList} Returns a TaskList containing all elements that found during search. Not ordered.
@@ -316,7 +337,7 @@ class TaskList {
 
         const output = new TaskList();
         output.#tasks = foundTasks;
-        //output.organizeTasks();
+        output.organizeTasks();
 
         return output;
     }
@@ -325,7 +346,6 @@ class TaskList {
      * Finds all tasks within this list whose execution time lies within the given time frame.
      * The time frame is inclusive: elements that lie exactly on the edges of the time frame will be included. 
      * The copies of the found items are placed into a new TaskList.
-     * The new TaskList is not orderd.
      * @param {Date} startTime Inclusive start of the search time frame.
      * @param {Date} endTime Inclusive end fo the search time frame.
      * @returns {TaskList} Returns a TaskList containing all elements that found during search. Not ordered.
@@ -351,7 +371,7 @@ class TaskList {
 
         const output = new TaskList();
         output.#tasks = foundTasks;
-        //output.organizeTasks();
+        output.organizeTasks();
 
         return output;
     }
@@ -360,7 +380,6 @@ class TaskList {
      * Finds all tasks within this list whose creation time lies within the given time frame.
      * The time frame is inclusive: elements that lie exactly on the edges of the time frame will be included. 
      * The copies of the found items are placed into a new TaskList.
-     * The new TaskList is not orderd.
      * @param {Date} startTime Inclusive start of the search time frame.
      * @param {Date} endTime Inclusive end fo the search time frame.
      * @returns {TaskList} Returns a TaskList containing all elements that found during search. Not ordered.
@@ -386,9 +405,30 @@ class TaskList {
 
         const output = new TaskList();
         output.#tasks = foundTasks;
-        //output.organizeTasks();
+        output.organizeTasks();
 
         return output;
+    }
+
+    /**
+     * Executes all Tasks stored in this TaskList.
+     * @param {Boolean} removeAfterExecution Whether or not the task will be removed from the taskList after execution. True by defaut.
+     */
+    executeAll(removeAfterExecution = true) {
+        idsToRemove = [];
+        tasksToExecute = Object.values(this.#tasks);
+        for (const task of tasksToExecute) {
+            if (task instanceof Task) {
+                task.execute();
+                if (removeAfterExecution) {
+                    idsToRemove.push(task.getId);
+                }
+            }
+        }
+
+        if (removeAfterExecution) {
+            this.removeTasks(...idsToRemove);
+        }
     }
 
     /**
