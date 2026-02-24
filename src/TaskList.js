@@ -77,7 +77,7 @@ class TaskList {
         // the value is an array of tasks ids coorpsonding to the tasks with that delay        
         const delays = {};
         for (const task of Object.values(this.#tasks)) {
-            const delay = task.getExectutionTime() - task.getCreationTime();
+            const delay = Math.max(task.getExectutionTime() - task.getCreationTime(), 0);
             const id = task.getId();
             let elements = delays[delay];
 

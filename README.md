@@ -1,3 +1,8 @@
+# Explanation
+- This library allows the user to schedule and manage multiple time delayed tasks while only ever using a single active timer.
+- Once a task is created and added to the Agenda object (the central object of the library), 
+then it will automatically execute when its time arrives. No other interactions are required.
+- The lightweight design requires no other dependencies.
 # Basic Usage
 Using the Agenda is simple and can be done in 4 easy steps.
 1. Initialize Agenda
@@ -6,7 +11,9 @@ Using the Agenda is simple and can be done in 4 easy steps.
 4. Wait for execution
 ## Basic summarized example
 ```
-const agenda = Agenda.getAgenda();
+import { Task, getAgenda }
+
+const agenda = getAgenda();
 
 const task1 = Task.createTaskWithExecutionDelay(
     1000 * 2,
@@ -21,19 +28,20 @@ agenda.addTasks(task1);
 ```
 # Expanded Basic Usage Explanation
 ## Initialize
-Initialization must occur before the Agenda object can be used, but you only need to do it once at the start of the program.
-The Agenda object is singleton, thus: any attempts to reference it after it is initialized will give a reference to the same Agenda object.
+Initialization must occur before the Agenda object can be used, but you only need to do so once at the start of the program.
+The Agenda object makes use of static references: any attempts to reference it after it is initialized will give a reference to the same Agenda object.
 ```
-const agenda = Agenda.getAgenda();
+const agenda = getAgenda();
 ```
 ## Create Task
 There are two ways to create a Task:
-1. Use a delay
-2. Use an execution time
+1. With a delay
+2. With an execution time
 
 The only differance is the first arguement.
 
 Using **setName()** to label the Tasks is optional.
+
 ### Create Task using a delay
 Please note that the execution time for objects created using a delay is calculated ***when the object is created*** not when it is added to the Agenda.
 #### Condensed Task Creation

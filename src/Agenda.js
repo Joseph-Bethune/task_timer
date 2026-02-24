@@ -1,5 +1,8 @@
 import { Task, TaskList } from "./TaskList.js";
 
+/**
+ * Test doc.
+ */
 class Agenda {
 
     //#region singleton code
@@ -32,7 +35,7 @@ class Agenda {
     // Keeps track of what tasks will be executed by the existing timer object and when those tasks will execute.
 
     #nextTasksIds = null;
-    #activeTimerId = null;
+    #activeTimout = null;
     #nextExecutionTime = null;
 
     /**
@@ -74,7 +77,7 @@ class Agenda {
 
             this.#nextTasksIds = newNextTaskIds;
 
-            this.#activeTimerId = setTimeout(() => {
+            this.#activeTimout = setTimeout(() => {
                 this.#executeTrackedTasks();
             }, delay);
 
@@ -86,9 +89,9 @@ class Agenda {
     #clearTaskTracker() {
         this.#nextTasksIds = null;
         this.#nextExecutionTime = null;
-        if (this.#activeTimerId != null) {
-            clearTimeout(this.#activeTimerId);
-            this.#activeTimerId = null;
+        if (this.#activeTimout != null) {
+            clearTimeout(this.#activeTimout);
+            this.#activeTimout = null;
         }
     }
 
@@ -198,7 +201,7 @@ class Agenda {
         const output = {
             tasklist: this.#taskList.toJson(),
             nextTaskIds: [...nextTaskIds],
-            activeTimerId: this.#activeTimerId,
+            activeTimerId: this.#activeTimout,
             nextExecutionTime: this.#nextExecutionTime,
         };
 
@@ -206,4 +209,20 @@ class Agenda {
     }
 }
 
-export { Task, TaskList, Agenda }
+/**
+ * Grants access to the sole Agenda object for the entire application. <br>
+ *  
+ * Only one Agenda object ever exists per app.
+ *  
+ * The first execution of this function initializes the Agenda and returns a reference to it.
+ *  
+ * Any subsequent executions of this function will return a reference to the same Agenda object.
+ *  
+ * This function must be executed before the Agenda object will work.
+ * @returns {Agenda} The Agenda object.
+ */
+const getAgenda = () => {
+    return Agenda.getAgenda();
+}
+
+export { Task, TaskList, Agenda, getAgenda }

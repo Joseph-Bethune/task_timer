@@ -1,6 +1,7 @@
 class Task {
     #id = ""
-    #name = ""
+    #name = null
+    #description = null
     #creationTime
     #executionTime
     #payloadFunction
@@ -11,7 +12,7 @@ class Task {
      * Must be added to an Agenda object in order to trigger automatically.
      * @param {Date} executionTime A Date object specifying when the execution function is to be triggered.
      * @param {Function} executionFunction The function to be executed when the exectuion time has been reached.
-     * @param  {...any} executionArguments Optional arguements to be given to the execution function.
+     * @param  {...any} executionArguments Optional arguments to be given to the execution function.
      * @returns Returns the newly created Task object.
      */
     static createTaskWithExecutionTime(executionTime, executionFunction, ...executionArguments) {
@@ -40,7 +41,7 @@ class Task {
      * Must be added to an Agenda object in order to trigger automatically.
      * @param {Number} executionDelay The delay in miliseconds that must pass before the execution function is triggered.
      * @param {Function} executionFunction The function to be executed when the exectuion time has been reached.
-     * @param  {...any} executionArguments Optional arguements to be given to the execution function.
+     * @param  {...any} executionArguments Optional arguments to be given to the execution function.
      * @returns Returns the newly created Task object.
      */
     static createTaskWithExecutionDelay(executionDelay, executionFunction, ...executionArguments) {
@@ -74,6 +75,7 @@ class Task {
 
         output.#id = this.#id;
         output.#name = this.#name
+        output.#description = this.#description;
         output.#creationTime = this.#creationTime
         output.#executionTime = this.#executionTime
         output.#payloadFunction = this.#payloadFunction
@@ -93,34 +95,94 @@ class Task {
         this.#id = newId;
     }
 
+    /**
+     * Gives the name assigned to this Task.
+     * If none has been assigned then the given value will be null.
+     * @returns {String} Returns the name assigned to this Task.
+     */
     getName() {
         return this.#name;
     }
+    /**
+     * Changes this Task's name. 
+     * Accepts null or any string.
+     * If the newName is not a null or string, then it will be turned into a string.
+     * @param {String} newName The name to be assigned to this Task.
+     */
     setName(newName) {
-        this.#name = newName;
+        if (newName == null || newName instanceof String) {
+            this.#name = newName;
+        } else {
+            this.#name = `${newName}`;
+        }
     }
 
+    /**
+     * Gives the description assigned to this Task.
+     * If none has been assigned then the given value will be null.
+     * @returns {String} Returns the description assigned to this Task.
+     */
+    getDescription() {
+        return this.#description;
+    }
+    /**
+     * Changes this Task's description.
+     * Accepts null or any string.
+     * If the newName is not a null or string, then it will be turned into a string.
+     * @param {String} newDescription The description to be assigned to this Task.
+     */
+    setDescription(newDescription) {
+        if (newDescription == null || newDescription instanceof String) {
+            this.#description = newDescription;
+        } else {
+            this.#description = `${newDescription}`;
+        }
+    }
+
+    /**
+     * Gives the creation time of this Task.
+     * @returns {Date} When this Task was created.
+     */
     getCreationTime() {
         return this.#creationTime;
     }
 
+    /**
+     * Gives the scheduled execution time of this Task.
+     * @returns {Date} When this Task is scheduled to execute.
+     */
     getExectutionTime() {
         return this.#executionTime;
     }
 
+    /**
+     * Gives the function that will be executed when this Task is triggerd.
+     * The function will always execute with the payload arguments if there are any.
+     * See getPayloadArguments().
+     * @returns {Function} The function that will be executed.
+     */
     getPayloadFunction() {
         return this.#payloadFunction;
     }
 
-    getPayloadArguements() {
-        return this.#payloadArguments;
+    /**
+     * Gives the payload arguments stored within this Task.
+     * If there are no payload arguments, this this will return an empty array.
+     * @returns {Any[]} The arguments that will be given to the payload function when it is executed, or an empty array.
+     */
+    getPayloadArguments() {
+        if (Array.isArray(this.#payloadArguments)) {
+            return [...this.#payloadArguments];
+        } else {
+            return [];
+        }
     }
 
     /**
-     * Executes the payload task with the given payload arguements.
+     * Executes the payload task with the given payload arguments.
      */
     execute() {
-        this.#payloadFunction(...this.#payloadArguments);
+        this.#payloadFunction(...this.getPayloadArguments());
     }
 
     /**
@@ -142,6 +204,7 @@ class Task {
         const output = {
             id: copy.#id,
             name: copy.#name,
+            description: copy.#description,
             creationTime: copy.#creationTime,
             executionTime: copy.#executionTime,
             payloadFunction: copy.#payloadFunction,
