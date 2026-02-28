@@ -194,6 +194,7 @@ class Agenda {
 
     /**
      * Attempts to generate a human readable copy of the contents of this object. Results vary.
+     * Date objects are given in local date-time.
      * @returns {Object} Human readable copy of contents.
      */
     toJson() {
@@ -202,7 +203,7 @@ class Agenda {
             tasklist: this.#taskList.toJson(),
             nextTaskIds: [...nextTaskIds],
             activeTimerId: this.#activeTimout,
-            nextExecutionTime: this.#nextExecutionTime,
+            nextExecutionTime: this.#nextExecutionTime.toLocaleString(),
         };
 
         return output;

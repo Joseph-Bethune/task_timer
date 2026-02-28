@@ -141,7 +141,7 @@ class TaskList {
      * They keys paired with those values are the Task's id.
      * @returns {Object} Generates a copy of the task dictionary.
      */
-    getTaskCopies() {
+    getTaskDictionary() {
         const output = {};
         for (const [key, value] of Object.entries(this.#tasks)) {
             output[key] = value.getCopy();
@@ -154,7 +154,7 @@ class TaskList {
      * This method copies each Task stored in the TaskList into a flat array.
      * @returns {Task[]} An array of Task copies.
      */
-    getTaskCopies_flat() {
+    getTaskArray() {
         if (this.#tasks == null) {
             return [];
         }
@@ -170,6 +170,15 @@ class TaskList {
     }
 
     /**
+     * This method returns the ids of all of the contained tasks as an array of strings. There is no specific ordering.
+     * @returns {String[]} An array of Task ids.
+     */
+    getTaskIds() {
+
+        return Object.keys(this.#tasks);
+    }
+
+    /**
      * Returns a copy of this object. The copy is an exact duplicate, but shares none of the same object references.
      * Any changes to either the original or the copy will have no affect on the other.
      * @returns {TaskList} The copy of this object.
@@ -177,7 +186,7 @@ class TaskList {
     getCopy() {
         const output = new TaskList();
 
-        output.#tasks = this.getTaskCopies();
+        output.#tasks = this.getTaskDictionary();
         output.#timeline = this.getTimelineCopy();
 
         return output;
@@ -330,7 +339,8 @@ class TaskList {
         const searchVal = caseSensitive ? searchString : `${searchString}`.toLowerCase();
         for (const element of Object.values(this.#tasks)) {
             const searchTarget = caseSensitive ? element.getName() : element.getName().toLowerCase();
-            if (searchTarget.includes(searchVal)) {
+            const match = searchTarget.includes(searchVal);
+            if (match) {
                 foundTasks[element.getId()] = element.getCopy();
             }
         }
@@ -350,12 +360,12 @@ class TaskList {
      * @param {Date} endTime Inclusive end fo the search time frame.
      * @returns {TaskList} Returns a TaskList containing all elements that found during search. Not ordered.
      */
-    findTasksWithinExecutionTimefram(startTime, endTime) {
-        if (!(startTime instanceof Data)) {
+    findTasksWithinExecutionTimeframe(startTime, endTime) {
+        if (!(startTime instanceof Date)) {
             throw new TypeError("The startTime must be an instance of the Date class.");
         }
 
-        if (!(endTime instanceof Data)) {
+        if (!(endTime instanceof Date)) {
             throw new TypeError("The endTime must be an instance of the Date class.");
         }
 
@@ -384,12 +394,12 @@ class TaskList {
      * @param {Date} endTime Inclusive end fo the search time frame.
      * @returns {TaskList} Returns a TaskList containing all elements that found during search. Not ordered.
      */
-    findTasksWithinCreationTimefram(startTime, endTime) {
-        if (!(startTime instanceof Data)) {
+    findTasksWithinCreationTimeframe(startTime, endTime) {
+        if (!(startTime instanceof Date)) {
             throw new TypeError("The startTime must be an instance of the Date class.");
         }
 
-        if (!(endTime instanceof Data)) {
+        if (!(endTime instanceof Date)) {
             throw new TypeError("The endTime must be an instance of the Date class.");
         }
 

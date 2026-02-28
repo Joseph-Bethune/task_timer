@@ -218,6 +218,7 @@ class Task {
 
     /**
      * Attempts to generate a human readable copy of the contents of this object. Results vary.
+     * Date objects are converted to local date-times in the output.
      * @returns {Object} Human readable copy of contents.
      */
     toJson() {
@@ -226,8 +227,8 @@ class Task {
             id: copy.#id,
             name: copy.#name,
             description: copy.#description,
-            creationTime: copy.#creationTime,
-            executionTime: copy.#executionTime,
+            creationTime: copy.#creationTime.toLocaleString(),
+            executionTime: copy.#executionTime.toLocaleString(),
             payloadFunction: copy.#payloadFunction,
             payloadArguments: [...copy.#payloadArguments],
         }
