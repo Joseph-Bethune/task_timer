@@ -353,6 +353,32 @@ class TaskList {
     }
 
     /**
+     * Finds all tasks within this list whose task description contains the search string. 
+     * The copies of the found items are placed into a new TaskList.
+     * @param {String} searchString The search criteria. 
+     * @param {Boolean} caseSensitive Whether or not case will be ignored during search.
+     * @returns {TaskList} Returns a TaskList containing all elements that found during search. Not ordered.
+     */
+    findTasksByDescription(searchString, caseSensitive = true) {
+        const foundTasks = {};
+
+        const searchVal = caseSensitive ? searchString : `${searchString}`.toLowerCase();
+        for (const element of Object.values(this.#tasks)) {
+            const searchTarget = caseSensitive ? element.getDescription() : element.getDescription().toLowerCase();
+            const match = searchTarget.includes(searchVal);
+            if (match) {
+                foundTasks[element.getId()] = element.getCopy();
+            }
+        }
+
+        const output = new TaskList();
+        output.#tasks = foundTasks;
+        output.organizeTasks();
+
+        return output;
+    }
+
+    /**
      * Finds all tasks within this list whose execution time lies within the given time frame.
      * The time frame is inclusive: elements that lie exactly on the edges of the time frame will be included. 
      * The copies of the found items are placed into a new TaskList.

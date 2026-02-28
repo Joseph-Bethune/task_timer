@@ -227,8 +227,8 @@ class Task {
             id: copy.#id,
             name: copy.#name,
             description: copy.#description,
-            creationTime: copy.#creationTime.toLocaleString(),
-            executionTime: copy.#executionTime.toLocaleString(),
+            creationTime: copy.getCreationTime().toLocaleString(),
+            executionTime: copy.getExectutionTime().toLocaleString(),
             payloadFunction: copy.#payloadFunction,
             payloadArguments: [...copy.#payloadArguments],
         }
