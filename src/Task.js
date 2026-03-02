@@ -1,11 +1,13 @@
 /**
- * An schedulable, executable task.
+ * A schedulable, executable task.
  * 
- * At its core, a Task is a fuction to be executed, the arguements to be given to that function, 
+ * At its core, a Task is an anonymous fuction, the arguements to be given to that function, 
  * and a timestamp indicating when that function is scheduled to execute.
  *  
  * The Task also stores additional information: 
- * a name, a description, a timestamp indicating when the Task was created.
+ * a name, a description, a timestamp indicating when the Task was created and an ID.
+ * 
+ * The ID is assigned after the Task has been added to the Agenda, and will be null until then.
  */
 class Task {
     #id = ""
@@ -99,7 +101,7 @@ class Task {
     /**
      * Gives the name assigned to this Task.
      * If none has been assigned then the given value will be null.
-     * @returns {String} Returns the name assigned to this Task.
+     * @returns {[String, Null]} Returns the name assigned to this Task.
      */
     getName() {
         return this.#name;
@@ -121,7 +123,7 @@ class Task {
     /**
      * Gives the description assigned to this Task.
      * If none has been assigned then the given value will be null.
-     * @returns {String} Returns the description assigned to this Task.
+     * @returns {[String, null]} Returns the description assigned to this Task.
      */
     getDescription() {
         return this.#description;

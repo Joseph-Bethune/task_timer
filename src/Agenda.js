@@ -192,6 +192,15 @@ class Agenda {
         return this.#taskList.getCopy();
     }
 
+
+    /**
+     * Clears all Tasks from the Agenda.
+     */
+    clearAgenda() {
+        this.#taskList = new TaskList();
+        this.#clearTaskTracker();
+    }
+
     /**
      * Attempts to generate a human readable copy of the contents of this object. Results vary.
      * Date objects are given in local date-time.
