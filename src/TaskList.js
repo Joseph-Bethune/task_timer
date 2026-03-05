@@ -120,37 +120,6 @@ class TaskList {
     }
 
     /**
-     * This method gives a copy this TaskList's time line.
-     * The timeline is an array of array of strings.
-     * Each string is a Task id.
-     * Each array of strings (named here as a "group") represents Tasks scheduled to execute at the same time.
-     * The groups are ordered in the outer most array by their execution times, with the earliest appearing first.
-     * @returns {String[]} Generates a copy of the timeline.
-     */
-    getTimelineCopy() {
-        const output = [];
-        for (const ids of this.#timeline) {
-            output.push([...ids]);
-        }
-        return output;
-    }
-
-    /**
-     * This method copies each of the Tasks and saves them into a dictionary of key-value pairs.
-     * The values in each pair are the individual Tasks.
-     * They keys paired with those values are the Task's id.
-     * @returns {Object} Generates a copy of the task dictionary.
-     */
-    getTaskDictionary() {
-        const output = {};
-        for (const [key, value] of Object.entries(this.#tasks)) {
-            output[key] = value.getCopy();
-        }
-
-        return output;
-    }
-
-    /**
      * This method copies each Task stored in the TaskList into a flat array.
      * @returns {Task[]} An array of Task copies.
      */
@@ -178,6 +147,39 @@ class TaskList {
         return Object.keys(this.#tasks);
     }
 
+    //#region Copying
+
+    /**
+     * This method gives a copy this TaskList's time line.
+     * The timeline is an array of array of strings.
+     * Each string is a Task id.
+     * Each array of strings (named here as a "group") represents Tasks scheduled to execute at the same time.
+     * The groups are ordered in the outer most array by their execution times, with the earliest appearing first.
+     * @returns {String[]} Generates a copy of the timeline.
+     */
+    getTimelineCopy() {
+        const output = [];
+        for (const ids of this.#timeline) {
+            output.push([...ids]);
+        }
+        return output;
+    }
+
+    /**
+     * This method copies each of the Tasks and saves them into a dictionary of key-value pairs.
+     * The values in each pair are the individual Tasks.
+     * They keys paired with those values are the Task's id.
+     * @returns {Object} Generates a copy of the task dictionary.
+     */
+    getTaskDictionaryCopy() {
+        const output = {};
+        for (const [key, value] of Object.entries(this.#tasks)) {
+            output[key] = value.getCopy();
+        }
+
+        return output;
+    }
+
     /**
      * Returns a copy of this object. The copy is an exact duplicate, but shares none of the same object references.
      * Any changes to either the original or the copy will have no affect on the other.
@@ -186,11 +188,15 @@ class TaskList {
     getCopy() {
         const output = new TaskList();
 
-        output.#tasks = this.getTaskDictionary();
+        output.#tasks = this.getTaskDictionaryCopy();
         output.#timeline = this.getTimelineCopy();
 
         return output;
     }
+
+    //#endregion
+
+    //#region Adding and removing tasks
 
     /**
      * Adds the task to this TaskList. 
@@ -255,6 +261,8 @@ class TaskList {
 
         return false;
     }
+
+    //#endregion
 
     /**
      * Gives the ids of the next tasks to execute as an array of strings.
@@ -326,12 +334,30 @@ class TaskList {
         return output;
     }
 
+    //#region FindTaskBy___ methods
+
+    /**
+     * Finds all tasks within this list whose ids match the given search values.
+     * The copies of the found items are placed into a new TaskList.
+     * @param  {...String} taskIds 
+     * @returns {TaskList} Returns a TaskList containing all elements found during search.
+     */
+    findTasksById(...taskIds) {
+        const tasks = getTasks_id(...taskIds);
+
+        const output = new TaskList();
+        output.#tasks = tasks;
+        output.organizeTasks();
+
+        return output;
+    }
+
     /**
      * Finds all tasks within this list whose task name contains the search string. 
      * The copies of the found items are placed into a new TaskList.
      * @param {String} searchString The search criteria. 
      * @param {Boolean} caseSensitive Whether or not case will be ignored during search.
-     * @returns {TaskList} Returns a TaskList containing all elements that found during search. Not ordered.
+     * @returns {TaskList} Returns a TaskList containing all elements found during search.
      */
     findTasksByName(searchString, caseSensitive = true) {
         const foundTasks = {};
@@ -357,7 +383,7 @@ class TaskList {
      * The copies of the found items are placed into a new TaskList.
      * @param {String} searchString The search criteria. 
      * @param {Boolean} caseSensitive Whether or not case will be ignored during search.
-     * @returns {TaskList} Returns a TaskList containing all elements that found during search. Not ordered.
+     * @returns {TaskList} Returns a TaskList containing all elements found during search.
      */
     findTasksByDescription(searchString, caseSensitive = true) {
         const foundTasks = {};
@@ -384,7 +410,7 @@ class TaskList {
      * The copies of the found items are placed into a new TaskList.
      * @param {Date} startTime Inclusive start of the search time frame.
      * @param {Date} endTime Inclusive end fo the search time frame.
-     * @returns {TaskList} Returns a TaskList containing all elements that found during search. Not ordered.
+     * @returns {TaskList} Returns a TaskList containing all elements that during search
      */
     findTasksWithinExecutionTimeframe(startTime, endTime) {
         if (!(startTime instanceof Date)) {
@@ -418,7 +444,7 @@ class TaskList {
      * The copies of the found items are placed into a new TaskList.
      * @param {Date} startTime Inclusive start of the search time frame.
      * @param {Date} endTime Inclusive end fo the search time frame.
-     * @returns {TaskList} Returns a TaskList containing all elements that found during search. Not ordered.
+     * @returns {TaskList} Returns a TaskList containing all elements found during search
      */
     findTasksWithinCreationTimeframe(startTime, endTime) {
         if (!(startTime instanceof Date)) {
@@ -445,6 +471,8 @@ class TaskList {
 
         return output;
     }
+
+    //#endregion
 
     /**
      * Executes all Tasks stored in this TaskList.

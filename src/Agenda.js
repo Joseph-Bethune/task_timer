@@ -14,9 +14,7 @@ class Agenda {
      * @returns {Agenda} Returns the agenda singleton.
      */
     static getAgenda() {
-        if (Agenda.#agenda == null) {
-            Agenda.#init();
-        }
+        Agenda.#init();
         return Agenda.#agenda;
     }
 
@@ -24,7 +22,9 @@ class Agenda {
      * Initializes the static Agenda singleton instance. Must be executed before the Agenda object can be used.
      */
     static #init() {
-        Agenda.#agenda = new Agenda();
+        if (Agenda.#agenda == null) {
+            Agenda.#agenda = new Agenda();
+        }
     }
 
     //#endregion
@@ -132,13 +132,7 @@ class Agenda {
 
     //#endregion
 
-    /**
-     * Give the total number of tasks still waiting to be executed.
-     * @returns {Number} The number of tasks on the Agenda as an integer.
-     */
-    getTaskCount() {
-        return this.#taskList.taskCount();
-    }
+    //#region Adding and removing tasks
 
     /**
      * Adds one or more tasks to the Agenda. Returns the total number of tasks after they addition.
@@ -168,6 +162,24 @@ class Agenda {
     }
 
     /**
+     * Clears all Tasks from the Agenda.
+     */
+    clearAgenda() {
+        this.#taskList = new TaskList();
+        this.#clearTaskTracker();
+    }
+
+    //#endregion
+
+    /**
+     * Give the total number of tasks still waiting to be executed.
+     * @returns {Number} The number of tasks on the Agenda as an integer.
+     */
+    getTaskCount() {
+        return this.#taskList.taskCount();
+    }
+
+    /**
      * Searches for a specific task using the given taskId. If one is found, it is exeuted.
      * @param {String} taskId The task id to search for.
      * @param {Boolean} removeAfterExecution Should the task be removed from the agenda after execution? By default, this is true.
@@ -185,20 +197,11 @@ class Agenda {
     }
 
     /**
-     * Returns a read only copy of the task list. Any changes to the copy won't affect the agenda.
-     * @returns {TaskList} Readonly copy of task list.
+     * Returns a read only copy of the TaskList conained within the Agenda. Any changes to the copy won't affect the agenda.
+     * @returns {TaskList} Copy of the contained TaskList.
      */
     getTaskList() {
         return this.#taskList.getCopy();
-    }
-
-
-    /**
-     * Clears all Tasks from the Agenda.
-     */
-    clearAgenda() {
-        this.#taskList = new TaskList();
-        this.#clearTaskTracker();
     }
 
     /**

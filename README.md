@@ -106,4 +106,75 @@ After the elapsed time periods, the following message will be displayed in the c
 This is Task 1. // this will display after 2 seconds
 This is Task 2. // this will display after 4 seconds
 ```
-# The TaskList
+# Key Points of Main Components
+
+## A Quick Warning about Task and TaskList copies
+
+All methods within this library that return a Task or TaskList implement defensive copying. The return values are always **copies** and most alterations will not affect the original...with one exception...
+
+Although it is not intended or recommended: alterations to the payload arguements of a Task copy can effect the original: be warned.
+
+## Library Classes
+
+At the core of this library are three classes:
+- Task
+- TaskList
+- Agenda
+
+## Task
+
+At its core, a Task is just an executable function and some optional parameters to feed into that function.
+
+Wrapped around this core are segments of information used to sort and search for Tasks within a group.
+
+### Creation
+
+There are two static factory methods contained within this class. They are the intended method of Task creation.
+```
+createTaskWithExecutionTime(executionTime, executionFunction, ...executionArguments)
+
+createTaskWithExecutionDelay(executionDelay, executionFunction, ...executionArguments)
+```
+
+### Automatic execution
+
+A Task is not *scheduled to execute* when it is initially created and has to be manually triggered in order to execute its function. To enable automatic execution, the Task must be added to the Agenda.
+
+## TaskList
+
+A TaskList is essentially just a group of tasks ordered by their scheduled execution times and some methods to help search through those Tasks.
+
+### FindTasksBy___ methods
+
+The TaskList class contains a special set of methods to search through the Tasks contained within for items that match the defined parameter.
+Each of these methods returns a new (and usually smaller) TaskList containing a subset of the original TaskList's contents.
+
+For instance: TaskList contains an instance method that searches for task descriptions.
+```
+const smallerTaskList = agenda.getTaskList().findTasksByDescription("zero");
+```
+This method collects all of the tasks whose description contains the given string value, copies them, and places the copies inside a new TaskList.
+
+There is a FindTasksBy___ method for each Task member variable.
+
+## Agenda
+
+The Agenda is the primary class of this library. It keeps track of all of the scheduled Tasks, automatically executing each when its scheduled time arrives.
+
+### Initialization
+```
+const agenda = getAgenda();
+```
+In order to function as intended, the **getAgenda()** method must called near the start of the project's execution. Any attempt to use the Agenda before it has been initialized will result in errors.
+
+### Singleton
+
+The Agenda is designed to be used as a singleton: only one instance exists for an entire project. To access this instance, use the **getAgenda()** static method. Calling this method anywhere in the project will always return the exact same instance of Agenda.
+
+### TaskList Container
+
+The Agenda contains a TaskList instance and a copy of this object can be accessed using a get method.
+
+```
+const taskList = agenda.getTaskList();
+```

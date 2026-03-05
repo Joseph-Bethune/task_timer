@@ -193,8 +193,8 @@ class Task {
         output.#id = this.#id;
         output.#name = this.#name
         output.#description = this.#description;
-        output.#creationTime = this.#creationTime
-        output.#executionTime = this.#executionTime
+        output.#creationTime = new Date(this.#creationTime)
+        output.#executionTime = new Date(this.#executionTime)
         output.#payloadFunction = this.#payloadFunction
         output.#payloadArguments = [...this.#payloadArguments]
 
