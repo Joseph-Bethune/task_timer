@@ -178,3 +178,29 @@ The Agenda contains a TaskList instance and a copy of this object can be accesse
 ```
 const taskList = agenda.getTaskList();
 ```
+
+### Manual Execution
+The Agenda object can be used to trigger manual execution of Tasks with the option of removing said Tasks from the Agenda after it has been executed.
+
+#### Execute a single task manually
+```
+const removeAfterExecution = true;
+
+const targetTaskIds = agenda..getTaskList().getNextTaskIds();
+
+agenda.executeTasksNow(targetTaskIds, removeAfterExecution);
+// or
+agenda.executeTasksNow(targetTaskId);
+```
+Both functions above do the same thing. By default, the executeAll() method will remove the Tasks once they are executed.
+#### Executing all tasks manually
+
+```
+const removeAfterExecution = true;
+
+agenda.executeAll(removeAfterExecution);
+```
+```
+agenda.executeAll();
+```
+Both functions above do the same thing. By default, the executeAll() method will remove the Tasks once they are executed.

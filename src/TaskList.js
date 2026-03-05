@@ -475,27 +475,6 @@ class TaskList {
     //#endregion
 
     /**
-     * Executes all Tasks stored in this TaskList.
-     * @param {Boolean} removeAfterExecution Whether or not the task will be removed from the taskList after execution. True by defaut.
-     */
-    executeAll(removeAfterExecution = true) {
-        idsToRemove = [];
-        tasksToExecute = Object.values(this.#tasks);
-        for (const task of tasksToExecute) {
-            if (task instanceof Task) {
-                task.execute();
-                if (removeAfterExecution) {
-                    idsToRemove.push(task.getId);
-                }
-            }
-        }
-
-        if (removeAfterExecution) {
-            this.removeTasks(...idsToRemove);
-        }
-    }
-
-    /**
      * Attempts to generate a human readable copy of the contents of this object. Results vary.
      * @returns {Object} Human readable copy of contents.
      */

@@ -31,6 +31,26 @@ class Agenda {
 
     #taskList = new TaskList();
 
+    //#region TaskList info
+
+    /**
+     * Give the total number of tasks still waiting to be executed.
+     * @returns {Number} The number of tasks on the Agenda as an integer.
+     */
+    getTaskCount() {
+        return this.#taskList.taskCount();
+    }
+
+    /**
+     * Returns a read only copy of the TaskList conained within the Agenda. Any changes to the copy won't affect the agenda.
+     * @returns {TaskList} Copy of the contained TaskList.
+     */
+    getTaskList() {
+        return this.#taskList.getCopy();
+    }
+
+    //#endregion
+
     //#region Task tracker
     // Keeps track of what tasks will be executed by the existing timer object and when those tasks will execute.
 
@@ -154,7 +174,7 @@ class Agenda {
      * @returns {Number} The number of tasks remaining on the Agenda. See getTaskCount().
      */
     removeTask(...taskIds) {
-        const changed = this.#taskList.removeTasks(taskIds);
+        const changed = this.#taskList.removeTasks(...taskIds);
         if (changed) {
             this.#checkTaskTracker();
         }
@@ -171,38 +191,62 @@ class Agenda {
 
     //#endregion
 
+    //#region Manual Executions
+
     /**
-     * Give the total number of tasks still waiting to be executed.
-     * @returns {Number} The number of tasks on the Agenda as an integer.
+     * Executes all of the tasks found using the given ids. Returns the ids of the tasks found.
+     * @param  {...String} taskIds 
+     * @returns {Task[]} The Tasks executed. Will never be null, but may be empty.
      */
-    getTaskCount() {
-        return this.#taskList.taskCount();
+    #executeTasks(...taskIds) {
+        const executedTasks = [];
+        const tasks = this.#taskList.getTasks_id(...taskIds);
+        if (tasks != null && tasks.length > 0) {
+            for (const task of tasks) {
+                task.execute();
+                executedTasks.push(task);
+            }
+        }
+
+        return executedTasks;
     }
 
     /**
-     * Searches for a specific task using the given taskId. If one is found, it is exeuted.
-     * @param {String} taskId The task id to search for.
-     * @param {Boolean} removeAfterExecution Should the task be removed from the agenda after execution? By default, this is true.
+     * Searches for specific tasks using the given taskId. Executes the found tasks.
+     * @param {String[]} taskIds The task ids to search for.
+     * @param {Boolean} removeAfterExecution Should the tasks be removed from the agenda after execution? By default, this is true.
      * @returns {Number} The number of remaining tasks. See getTaskCount().
      */
-    executeTaskNow(taskId, removeAfterExecution = true) {
-        const tasks = this.#taskList.getTasks_id(taskId)
-        if (tasks != null && tasks.length > 0) {
-            tasks[0].execute();
-            if (removeAfterExecution) {
-                this.removeTask(taskId);
-            }
+    executeTasksNow(taskIds, removeAfterExecution = true) {
+        const executedTasks = this.#executeTasks(...taskIds);
+        if (removeAfterExecution) {
+            this.removeTask(...executedTasks.map(task => task.getId()));
         }
         return this.getTaskCount();
     }
 
     /**
-     * Returns a read only copy of the TaskList conained within the Agenda. Any changes to the copy won't affect the agenda.
-     * @returns {TaskList} Copy of the contained TaskList.
+     * Executes all Tasks stored in this TaskList.
+     * @param {Boolean} removeAfterExecution Whether or not the task will be removed from the taskList after execution. True by defaut.
      */
-    getTaskList() {
-        return this.#taskList.getCopy();
+    executeAll(removeAfterExecution = true) {
+        const idsToRemove = [];
+        const tasksToExecute = this.getTaskList().getTaskArray();
+        for (const task of tasksToExecute) {
+            task.execute();
+            if (removeAfterExecution) {
+                idsToRemove.push(task.getId());
+            }
+        }
+
+        if (removeAfterExecution) {
+            this.removeTask(...idsToRemove);
+        }
     }
+
+    //#endregion
+
+    //#region toJson
 
     /**
      * Attempts to generate a human readable copy of the contents of this object. Results vary.
@@ -220,6 +264,8 @@ class Agenda {
 
         return output;
     }
+
+    //#endregion
 }
 
 /**
